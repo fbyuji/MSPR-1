@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Résultats du Scan</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <h1>Résultats du Scan Réseau</h1>
+    <ul>
+      {% for result in results %}
+      <li>
+        <strong>IP :</strong> {{ result.ip }} <br />
+        <strong>Ports ouverts :</strong>
+        {% if result.open_ports %} {{ result.open_ports | join(", ") }} {% else
+        %} Aucun {% endif %}
+      </li>
+      {% endfor %}
+    </ul>
+    <a href="/" class="btn">← Retour au tableau de bord</a>
+  </body>
+</html>

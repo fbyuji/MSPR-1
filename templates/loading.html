@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chargement</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Veuillez patienter...</h1>
+    <p>Le scan réseau est en cours, cela peut prendre quelques secondes.</p>
+    <script>
+        // Rediriger automatiquement vers la page des résultats après un court délai
+        setTimeout(() => {
+            window.location.href = "/scan/results";
+        }, 500);  // 500 ms (ajuster le délai si nécessaire)
+    </script>
+</body>
+</html>

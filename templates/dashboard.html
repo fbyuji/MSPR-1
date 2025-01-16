@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seahawks Harvester</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <h1>Tableau de Bord Seahawks Harvester</h1>
+
+    <h2>Informations Générales</h2>
+    <p><strong>Adresse IP locale :</strong> {{ data.local_ip }}</p>
+    <p><strong>Nom de la VM :</strong> {{ data.vm_name }}</p>
+    <p>
+      <strong>Nombre de machines connectées :</strong> {{
+      data.connected_machines }}
+    </p>
+    <p><strong>Latence WAN :</strong> {{ data.latency }}</p>
+    <p><strong>Version :</strong> {{ data.version }}</p>
+
+
+    <h2>Actions</h2>
+    <a href="/scan" class="btn">Lancer un scan réseau</a>
+    
+
+    <h2>Dernier Scan Réseau</h2>
+    <ul>
+      {% for machine in data.last_scan %}
+      <li>{{ machine.ip }} - Port Status : {{ machine.status }}</li>
+      {% endfor %}
+    </ul>
+
+    <footer>© 2025 Seahawks Monitoring</footer>
+  </body>
+</html>
