@@ -6,7 +6,7 @@ app = Flask(__name__)
 
 def perform_network_scan():
     # Spécifier explicitement le chemin de nmap.exe
-    nm = nmap.PortScanner(nmap_search_path=('C:\\Program Files (x86)\\Nmap\\nmap.exe',))
+    nm = nmap.PortScanner()
 
     # Scanner une plage réseau
     nm.scan(hosts='192.168.1.0/24', arguments='-sS -p 22,80,443')
@@ -57,4 +57,5 @@ def scan_results():
     return render_template("scan.html", results=results)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")
+
