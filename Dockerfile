@@ -18,3 +18,6 @@ EXPOSE 5000
 
 # 7. Lancer l'application
 CMD ["python", "app.py"]
+
+RUN apt-get update && apt-get install -y iputils-ping nmap
+
