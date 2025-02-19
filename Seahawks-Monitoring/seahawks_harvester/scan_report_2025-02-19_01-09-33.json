@@ -1,0 +1,10 @@
+[
+    {
+        "ip": "192.168.56.1",
+        "hostname": "Inconnu",
+        "status": "up",
+        "open_ports": [
+            "Aucun"
+        ]
+    }
+]
