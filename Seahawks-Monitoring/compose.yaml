@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  seahawks_harvester:
+    build: ./seahawks_harvester
+    container_name: seahawks_harvester
+    ports:
+      - "5000:5000"
+    networks:
+      - seahawks_network
+    volumes:
+      - ./seahawks_harvester:/app
+    environment:
+      - FLASK_ENV=development
+
+  seahawks_nester:
+    build: ./seahawks_nester
+    container_name: seahawks_nester
+    ports:
+      - "5001:5001"
+    networks:
+      - seahawks_network
+    volumes:
+      - ./seahawks_nester:/app
+    environment:
+      - FLASK_ENV=development
+
+networks:
+  seahawks_network:
+    driver: bridge

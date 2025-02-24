@@ -94,8 +94,8 @@ def save_scan_report(scan_results):
 
 def send_scan_results(scan_results):
     """Envoie les résultats du scan à Seahawks Nester"""
-    #url = "http://seahawks_nester:5001/api/upload_scan"
-    url = "http://127.0.0.1:5001/api/upload_scan"
+    url = "http://seahawks_nester:5001/api/upload_scan"
+    #url = "http://127.0.0.1:5001/api/upload_scan"
 
 
  
