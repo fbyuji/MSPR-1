@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seahawks Nester - Tableau de bord</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Tableau de Bord - Seahawks Nester</h1>
+
+    <h2>Résultats des scans</h2>
+
+    {% if scans %}
+        <table>
+            <tr>
+                <th>IP</th>
+                <th>Nom d'hôte</th>
+                <th>Statut</th>
+                <th>Ports ouverts</th>
+            </tr>
+            {% for scan in scans %}
+            <tr>
+                <td>{{ scan.ip if scan.ip else "Non défini" }}</td>
+                <td>{{ scan.hostname if scan.hostname else "Non défini" }}</td>
+                <td>{{ scan.status if scan.status else "Inconnu" }}</td>
+                <td>{{ ", ".join(scan.open_ports) if scan.open_ports else "Aucun port ouvert" }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>Aucun scan enregistré pour le moment.</p>
+    {% endif %}
+
+    
+
+    <footer>© 2025 Seahawks Monitoring</footer>
+</body>
+</html>
