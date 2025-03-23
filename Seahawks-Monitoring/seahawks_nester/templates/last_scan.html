@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Dernier Scan Réseau - Seahawks Nester</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Dernier Résultat du Scan pour {{ sonde.ip }}</h1>
+    <table>
+        <tr>
+            <td>IP</td>
+            <td>{{ sonde.ip }}</td>
+        </tr>
+        <tr>
+            <td>Hostname</td>
+            <td>{{ sonde.hostname }}</td>
+        </tr>
+        <tr>
+            <td>Statut</td>
+            <td>{{ sonde.status }}</td>
+        </tr>
+        <tr>
+            <td>Dernier Scan</td>
+            <td>{{ sonde.last_scan }}</td>
+        </tr>
+        <tr>
+            <td>Ports ouverts</td>
+            <td>
+            {% if sonde.open_ports %}
+                {{ sonde.open_ports | join(', ') }}
+            {% else %}
+                Aucun port ouvert
+            {% endif %}
+            </td>
+        </tr>
+    </table>
+    <a href="{{ url_for('get_sonde', sonde_id=sonde_id) }}">Retour aux détails</a>
+
+    <footer>© 2025 Seahawks Monitoring</footer>
+</body>
+</html>

@@ -1,0 +1,64 @@
+{
+    "sondes": [
+        {
+            "id": 0,
+            "ip": "172.18.0.1",
+            "hostname": "Inconnu",
+            "status": "up",
+            "last_scan": "2025-03-23 21:11:40",
+            "open_ports": [
+                "Aucun"
+            ],
+            "scans": [
+                {
+                    "ip": "172.18.0.1",
+                    "open_ports": [
+                        "Aucun"
+                    ],
+                    "status": "up",
+                    "timestamp": "2025-03-23 21:11:40"
+                }
+            ]
+        },
+        {
+            "id": 1,
+            "ip": "172.18.0.2",
+            "hostname": "seahawks_nester.seahawks-monitoring_seahawks_network",
+            "status": "up",
+            "last_scan": "2025-03-23 21:11:40",
+            "open_ports": [
+                "Aucun"
+            ],
+            "scans": [
+                {
+                    "ip": "172.18.0.2",
+                    "open_ports": [
+                        "Aucun"
+                    ],
+                    "status": "up",
+                    "timestamp": "2025-03-23 21:11:40"
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "ip": "172.18.0.3",
+            "hostname": "79a6e5a18d11",
+            "status": "up",
+            "last_scan": "2025-03-23 21:11:40",
+            "open_ports": [
+                "Aucun"
+            ],
+            "scans": [
+                {
+                    "ip": "172.18.0.3",
+                    "open_ports": [
+                        "Aucun"
+                    ],
+                    "status": "up",
+                    "timestamp": "2025-03-23 21:11:40"
+                }
+            ]
+        }
+    ]
+}

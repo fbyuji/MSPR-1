@@ -12,62 +12,76 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-# 📌 Variable globale pour stocker le dernier scan
 last_scan_results = []  
 
 def get_local_network():
-    """Récupère l'adresse IP locale et la plage réseau"""
     try:
         local_ip = socket.gethostbyname(socket.gethostname())
         network_prefix = ".".join(local_ip.split(".")[:-1]) + ".0/24"
         return local_ip, network_prefix
-    except Exception as e:
+    except Exception:
         return "Erreur", "192.168.1.0/24"
 
 def perform_network_scan():
-    """Effectue un scan réseau sur les ports 22, 80, 443, 3389, 3306"""
-    global last_scan_results  
+    global last_scan_results
     nm = nmap.PortScanner()
     local_ip, network_prefix = get_local_network()
+    scan_results = []
 
     try:
         nm.scan(hosts=network_prefix, arguments='-sS -p 22,80,443,3389,3306')
-        scan_results = []
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        for host in nm.all_hosts():
+        for idx, host in enumerate(nm.all_hosts()):
             open_ports = []
             if 'tcp' in nm[host]:
                 for port, details in nm[host]['tcp'].items():
                     if details['state'] == 'open':
-                        open_ports.append(str(port))  
+                        open_ports.append(str(port))
 
             scan_results.append({
+                "id": idx, 
                 "ip": host,
-                "hostname": nm[host].hostname() if nm[host].hostname() else "Inconnu",
+                "hostname": nm[host].hostname() or "Inconnu",
                 "status": nm[host].state(),
-                "open_ports": open_ports if open_ports else ["Aucun"]
+                "open_ports": open_ports if open_ports else ["Aucun"],
+                "scan_time": now,  
+                "last_scan_date": now,  
+                "scans": [{
+                    "ip": host,
+                    "open_ports": open_ports if open_ports else ["Aucun"],
+                    "status": nm[host].state()
+                }]
             })
 
-        last_scan_results = scan_results  # Met à jour la variable globale
+        last_scan_results = scan_results
         return scan_results
 
     except Exception as e:
-        return [{"ip": "Erreur", "hostname": "N/A", "status": "N/A", "open_ports": [str(e)]}]
+        return [{
+            "id": -1,
+            "ip": "Erreur",
+            "hostname": "N/A",
+            "status": "N/A",
+            "open_ports": [str(e)],
+            "scan_time": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "last_scan_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "scans": []
+        }]
 
 def get_latency():
-    """Mesure la latence WAN en pingant Google"""
     try:
         target = "8.8.8.8"
         latencies = []
 
-        for _ in range(4):  
+        for _ in range(4):
             start_time = time.time()
             response = os.system("ping -c 1 " + target if os.name != "nt" else "ping -n 1 " + target)
             end_time = time.time()
 
             if response == 0:
-                latencies.append((end_time - start_time) * 1000)  
-        
+                latencies.append((end_time - start_time) * 1000)
+
         if latencies:
             return f"{round(statistics.mean(latencies), 2)} ms"
         return "Indisponible"
@@ -75,7 +89,6 @@ def get_latency():
         return f"Erreur : {e}"
 
 def save_scan_report(scan_results):
-    """Sauvegarde les résultats du scan en JSON et HTML"""
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     json_filename = f"scan_report_{timestamp}.json"
@@ -86,6 +99,7 @@ def save_scan_report(scan_results):
     with open(html_filename, "w") as f:
         f.write("<html><head><title>Rapport de Scan Réseau</title></head><body>")
         f.write("<h1>Rapport de Scan Réseau</h1>")
+        f.write(f"<p><strong>Date du rapport :</strong> {timestamp}</p>")  
         for machine in scan_results:
             f.write(f"<p><strong>IP :</strong> {machine['ip']} - <strong>Ports ouverts :</strong> {', '.join(machine['open_ports'])}</p>")
         f.write("</body></html>")
@@ -93,19 +107,28 @@ def save_scan_report(scan_results):
     return json_filename, html_filename
 
 def send_scan_results(scan_results):
-    """Envoie les résultats du scan à Seahawks Nester"""
     url = "http://seahawks_nester:5001/api/upload_scan"
-    #url = "http://127.0.0.1:5001/api/upload_scan"
-
-
- 
     headers = {"Content-Type": "application/json"}
-    response = requests.post(url, json=scan_results, headers=headers)
-    return response.status_code
+
+    print("📤 Envoi des données au serveur Nester...")
+    try:
+        print(f"➡️ Payload : {json.dumps(scan_results)}") 
+        response = requests.post(url, json=scan_results, headers=headers)
+        response.raise_for_status()
+        print(f"✅ Réponse serveur : {response.status_code}")
+    except requests.exceptions.RequestException as e:
+        print(f"❌ Erreur lors de l'envoi : {e}")
+
+def load_version():
+    try:
+        with open("version.json", "r") as version_file:
+            version_data = json.load(version_file)
+            return version_data["version"]
+    except Exception:
+        return "Inconnue"
 
 @app.route("/")
 def home():
-    """Affiche le tableau de bord"""
     local_ip, network_prefix = get_local_network()
     vm_name = socket.gethostname()
 
@@ -118,30 +141,30 @@ def home():
         "vm_name": vm_name,
         "connected_machines": connected_machines,
         "latency": get_latency(),
-        "version": "1.0.0",
-        "last_scan": last_scan_results  # Utilise les résultats du dernier scan
+        "version": load_version(),
+        "last_scan": last_scan_results
     }
 
     return render_template("dashboard.html", data=data)
 
 @app.route("/scan")
 def scan():
-    """Affiche une page de chargement avant le scan"""
     return render_template("loading.html")
 
 @app.route("/scan/results")
 def scan_results():
-    """Effectue un scan réseau, sauvegarde et envoie les résultats"""
-    global last_scan_results  
+    global last_scan_results
     last_scan_results = perform_network_scan()
     save_scan_report(last_scan_results)
-    send_scan_results(last_scan_results)  
+
+    print("📡 Appel de send_scan_results...") 
+
+    send_scan_results(last_scan_results)
 
     return render_template("scan.html", results=last_scan_results)
 
 @app.route("/scan/download/json")
 def download_json_report():
-    """Permet de télécharger le dernier rapport de scan en JSON"""
     files = sorted(glob.glob("scan_report_*.json"), reverse=True)
     if files:
         return send_file(files[0], as_attachment=True)
@@ -149,7 +172,6 @@ def download_json_report():
 
 @app.route("/scan/download/html")
 def download_html_report():
-    """Permet de télécharger le dernier rapport de scan en HTML"""
     files = sorted(glob.glob("scan_report_*.html"), reverse=True)
     if files:
         return send_file(files[0], as_attachment=True)
