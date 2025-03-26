@@ -1,19 +1,58 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chargement</title>
+    <title>Chargement...</title>
+    
+    <!-- Lien vers le fichier CSS -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            background-color: #f4f4f9;
+            font-family: Arial, sans-serif;
+        }
+        .loading-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .spinner {
+            margin-top: 15px;
+            width: 40px;
+            height: 40px;
+            border: 5px solid #ccc;
+            border-top-color: #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-    <h1>Veuillez patienter...</h1>
-    <p>Le scan réseau est en cours, cela peut prendre quelques secondes.</p>
+
+    <div class="loading-container">
+        <h1>⏳ Veuillez patienter...</h1>
+        <p>Le scan réseau est en cours, cela peut prendre quelques secondes.</p>
+        <div class="spinner"></div>
+    </div>
+
     <script>
-        // Rediriger automatiquement vers la page des résultats après un court délai
+        // Rediriger automatiquement vers la page des résultats après 500 ms
         setTimeout(() => {
             window.location.href = "/scan/results";
-        }, 500);  // 500 ms (ajuster le délai si nécessaire)
+        }, 500);  // Garde le même délai rapide
     </script>
+
 </body>
 </html>
