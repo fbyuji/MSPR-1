@@ -1,7 +1,7 @@
 {
     "scans": [
         {
-            "ip": "172.19.0.1",
+            "ip": "172.18.0.1",
             "hostname": "Inconnu",
             "status": "up",
             "open_ports": [
@@ -9,7 +9,7 @@
             ]
         },
         {
-            "ip": "172.19.0.2",
+            "ip": "172.18.0.2",
             "hostname": "seahawks_nester.seahawks-monitoring_seahawks_network",
             "status": "up",
             "open_ports": [
@@ -17,12 +17,62 @@
             ]
         },
         {
-            "ip": "172.19.0.3",
-            "hostname": "3bfa64ff0c9c",
+            "ip": "172.18.0.3",
+            "hostname": "8fc65f9d8ef5",
             "status": "up",
             "open_ports": [
                 "Aucun"
             ]
+        },
+        {
+            "ip": "172.18.0.1",
+            "hostname": "Inconnu",
+            "status": "up",
+            "open_ports": [
+                "Aucun"
+            ]
+        },
+        {
+            "ip": "172.18.0.2",
+            "hostname": "seahawks_nester.seahawks-monitoring_seahawks_network",
+            "status": "up",
+            "open_ports": [
+                "Aucun"
+            ]
+        },
+        {
+            "ip": "172.18.0.3",
+            "hostname": "8fc65f9d8ef5",
+            "status": "up",
+            "open_ports": [
+                "Aucun"
+            ]
+        }
+    ],
+    "sondes": [
+        {
+            "id": "172-18-0-1",
+            "ip": "172.18.0.1",
+            "hostname": "Inconnu",
+            "status": "up",
+            "open_ports": [],
+            "last_scan": "2025-03-28 23:26:39"
+        },
+        {
+            "id": "172-18-0-2",
+            "ip": "172.18.0.2",
+            "hostname": "seahawks_nester.seahawks-monitoring_seahawks_network",
+            "status": "up",
+            "open_ports": [],
+            "last_scan": "2025-03-28 23:26:39"
+        },
+        {
+            "id": "172-18-0-3",
+            "ip": "172.18.0.3",
+            "hostname": "8fc65f9d8ef5",
+            "status": "up",
+            "open_ports": [],
+            "last_scan": "2025-03-28 23:26:39"
         }
     ]
 }

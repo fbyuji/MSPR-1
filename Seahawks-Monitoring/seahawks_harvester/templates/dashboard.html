@@ -40,8 +40,7 @@
       color: white;
       border-radius: 5px;
     }
-    .table th,
-    .table td {
+    .table th, .table td {
       text-align: center;
     }
   </style>
@@ -121,7 +120,7 @@
       if (!tableBody) return;
 
       const rows = Array.from(tableBody.getElementsByTagName("tr"));
-      if (rows.length <= 7) return; // Pas de pagination nécessaire
+      if (rows.length <= 7) return;
 
       let currentPage = 1;
       let entriesPerPage = 10;

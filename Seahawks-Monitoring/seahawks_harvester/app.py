@@ -9,74 +9,80 @@ import json
 import glob
 import requests
 from datetime import datetime
+from zoneinfo import ZoneInfo 
+from version import __version__
 
 app = Flask(__name__)
-
-# 📌 Variable globale pour stocker le dernier scan
-last_scan_results = []  
+last_scan_results = []
 
 def get_local_network():
-    """Récupère l'adresse IP locale et la plage réseau"""
     try:
         local_ip = socket.gethostbyname(socket.gethostname())
         network_prefix = ".".join(local_ip.split(".")[:-1]) + ".0/24"
         return local_ip, network_prefix
-    except Exception as e:
+    except Exception:
         return "Erreur", "192.168.1.0/24"
 
+def get_current_paris_time(fmt="%Y-%m-%d %H:%M:%S"):
+    return datetime.now(ZoneInfo("Europe/Paris")).strftime(fmt)
+
 def perform_network_scan():
-    """Effectue un scan réseau sur les ports 22, 80, 443, 3389, 3306"""
-    global last_scan_results  
+    global last_scan_results
     nm = nmap.PortScanner()
     local_ip, network_prefix = get_local_network()
 
     try:
         nm.scan(hosts=network_prefix, arguments='-sS -p 22,80,443,3389,3306')
         scan_results = []
+        timestamp = get_current_paris_time() 
 
         for host in nm.all_hosts():
             open_ports = []
             if 'tcp' in nm[host]:
                 for port, details in nm[host]['tcp'].items():
                     if details['state'] == 'open':
-                        open_ports.append(str(port))  
+                        open_ports.append(str(port))
 
             scan_results.append({
+                "id": host.replace(".", "-"),
                 "ip": host,
-                "hostname": nm[host].hostname() if nm[host].hostname() else "Inconnu",
+                "hostname": nm[host].hostname() or "Inconnu",
                 "status": nm[host].state(),
-                "open_ports": open_ports if open_ports else ["Aucun"]
+                "open_ports": open_ports,
+                "last_scan": timestamp
             })
 
-        last_scan_results = scan_results  # Met à jour la variable globale
+        last_scan_results = scan_results
         return scan_results
 
     except Exception as e:
-        return [{"ip": "Erreur", "hostname": "N/A", "status": "N/A", "open_ports": [str(e)]}]
+        return [{
+            "id": "erreur",
+            "ip": "Erreur",
+            "hostname": "N/A",
+            "status": "N/A",
+            "open_ports": [str(e)],
+            "last_scan": get_current_paris_time()
+        }]
 
 def get_latency():
-    """Mesure la latence WAN en pingant Google"""
     try:
         target = "8.8.8.8"
         latencies = []
 
-        for _ in range(4):  
+        for _ in range(4):
             start_time = time.time()
-            response = os.system("ping -c 1 " + target if os.name != "nt" else "ping -n 1 " + target)
+            response = os.system("ping -n 1 " + target if os.name == "nt" else "ping -c 1 " + target)
             end_time = time.time()
-
             if response == 0:
-                latencies.append((end_time - start_time) * 1000)  
-        
-        if latencies:
-            return f"{round(statistics.mean(latencies), 2)} ms"
-        return "Indisponible"
+                latencies.append((end_time - start_time) * 1000)
+
+        return f"{round(statistics.mean(latencies), 2)} ms" if latencies else "Indisponible"
     except Exception as e:
         return f"Erreur : {e}"
 
 def save_scan_report(scan_results):
-    """Sauvegarde les résultats du scan en JSON et HTML"""
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    timestamp = get_current_paris_time(fmt="%Y-%m-%d_%H-%M-%S") 
 
     json_filename = f"scan_report_{timestamp}.json"
     with open(json_filename, "w") as f:
@@ -93,19 +99,18 @@ def save_scan_report(scan_results):
     return json_filename, html_filename
 
 def send_scan_results(scan_results):
-    """Envoie les résultats du scan à Seahawks Nester"""
-    url = "http://seahawks_nester:5001/api/upload_scan"
-    #url = "http://127.0.0.1:5001/api/upload_scan"
-
-
- 
+    url = "http://seahawks_nester:5001/api/upload_sonde"
     headers = {"Content-Type": "application/json"}
-    response = requests.post(url, json=scan_results, headers=headers)
-    return response.status_code
+    try:
+        response = requests.post(url, json=scan_results, headers=headers)
+        print("📤 Envoi au Nester :", response.status_code)
+        return response.status_code
+    except Exception as e:
+        print("❌ Envoi échoué :", e)
+        return 500
 
 @app.route("/")
 def home():
-    """Affiche le tableau de bord"""
     local_ip, network_prefix = get_local_network()
     vm_name = socket.gethostname()
 
@@ -118,42 +123,33 @@ def home():
         "vm_name": vm_name,
         "connected_machines": connected_machines,
         "latency": get_latency(),
-        "version": "1.0.0",
-        "last_scan": last_scan_results  # Utilise les résultats du dernier scan
+        "version": __version__,
+        "last_scan": last_scan_results
     }
 
     return render_template("dashboard.html", data=data)
 
 @app.route("/scan")
 def scan():
-    """Affiche une page de chargement avant le scan"""
     return render_template("loading.html")
 
 @app.route("/scan/results")
 def scan_results():
-    """Effectue un scan réseau, sauvegarde et envoie les résultats"""
-    global last_scan_results  
+    global last_scan_results
     last_scan_results = perform_network_scan()
     save_scan_report(last_scan_results)
-    send_scan_results(last_scan_results)  
-
+    send_scan_results(last_scan_results)
     return render_template("scan.html", results=last_scan_results)
 
 @app.route("/scan/download/json")
 def download_json_report():
-    """Permet de télécharger le dernier rapport de scan en JSON"""
     files = sorted(glob.glob("scan_report_*.json"), reverse=True)
-    if files:
-        return send_file(files[0], as_attachment=True)
-    return "Aucun rapport disponible", 404
+    return send_file(files[0], as_attachment=True) if files else ("Aucun rapport disponible", 404)
 
 @app.route("/scan/download/html")
 def download_html_report():
-    """Permet de télécharger le dernier rapport de scan en HTML"""
     files = sorted(glob.glob("scan_report_*.html"), reverse=True)
-    if files:
-        return send_file(files[0], as_attachment=True)
-    return "Aucun rapport disponible", 404
+    return send_file(files[0], as_attachment=True) if files else ("Aucun rapport disponible", 404)
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0")

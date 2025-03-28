@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails de la Sonde</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        body {
+            background-color: #f4f4f9;
+        }
+        .container {
+            margin-top: 40px;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        footer {
+            margin-top: 40px;
+            padding: 15px;
+            background-color: #343a40;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+        }
+        .badge-port {
+            background-color: #007bff;
+            color: white;
+            margin: 3px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        .info-title {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 class="text-center mb-4">🛰️ Détails de la Sonde</h1>
+
+    <div class="row mb-3">
+        <div class="col-md-6"><p><span class="info-title">🆔 ID Sonde :</span> {{ sonde.id }}</p></div>
+        <div class="col-md-6"><p><span class="info-title">📡 IP :</span> {{ sonde.ip }}</p></div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6"><p><span class="info-title">💻 Nom d'hôte :</span> {{ sonde.hostname }}</p></div>
+        <div class="col-md-6"><p><span class="info-title">📶 Statut :</span> {{ sonde.status }}</p></div>
+    </div>
+
+    <div class="mb-3">
+        <p><span class="info-title">🕒 Dernier Scan :</span> {{ sonde.last_scan }}</p>
+    </div>
+
+    <div class="mb-3">
+        <p><span class="info-title">🔐 Ports ouverts ({{ sonde.open_ports | length if sonde.open_ports else 0 }}) :</span></p>
+        {% if sonde.open_ports %}
+            {% for port in sonde.open_ports %}
+                <span class="badge-port">{{ port }}</span>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted">Aucun port ouvert</p>
+        {% endif %}
+    </div>
+
+    <div class="text-center mt-4">
+        <a href="/" class="btn btn-secondary">← Retour au tableau de bord</a>
+    </div>
+</div>
+
+<footer>
+    © 2025 Seahawks Monitoring
+</footer>
+
+</body>
+</html>

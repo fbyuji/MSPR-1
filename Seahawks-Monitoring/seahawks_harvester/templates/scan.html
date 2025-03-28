@@ -1,110 +1,110 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Résultats du Scan</title>
-    
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Résultats du Scan</title>
 
-    <style>
-        body {
-            background-color: #f4f4f9;
-        }
-        .container {
-            margin-top: 20px;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        .btn-back {
-            background-color: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 10px;
-        }
-        .btn-back:hover {
-            background-color: #0056b3;
-        }
-        footer {
-            margin-top: 20px;
-            padding: 10px;
-            text-align: center;
-            background: #343a40;
-            color: white;
-            border-radius: 5px;
-        }
-        .table th, .table td {
-            text-align: center;
-        }
-    </style>
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}" />
+
+  <style>
+    body {
+      background-color: #f4f4f9;
+    }
+    .container {
+      margin-top: 20px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .btn-back {
+      background-color: #007bff;
+      color: white;
+      padding: 10px 15px;
+      border-radius: 5px;
+      text-decoration: none;
+      display: inline-block;
+      margin-top: 10px;
+    }
+    .btn-back:hover {
+      background-color: #0056b3;
+    }
+    footer {
+      margin-top: 20px;
+      padding: 10px;
+      text-align: center;
+      background: #343a40;
+      color: white;
+      border-radius: 5px;
+    }
+    .table th, .table td {
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
 
 <div class="container">
-    <h1 class="text-center mb-4">📡 Résultats du Scan Réseau</h1>
+  <h1 class="text-center mb-4">📡 Résultats du Scan Réseau</h1>
 
-    {% if results %}
-        {% if results|length > 7 %}
-        <div class="mb-3">
-            <label for="entriesPerPage" class="form-label">Afficher :</label>
-            <select id="entriesPerPage" class="form-select" onchange="updateTable()">
-                <option value="5">5</option>
-                <option value="10" selected>10</option>
-            </select> entrées
-        </div>
-        {% endif %}
-
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>IP</th>
-                        <th>Ports ouverts</th>
-                    </tr>
-                </thead>
-                <tbody id="scanTableBody">
-                    {% for result in results %}
-                    <tr>
-                        <td>{{ result.ip }}</td>
-                        <td>
-                            {% if result.open_ports %}
-                                {{ result.open_ports | join(", ") }}
-                            {% else %}
-                                Aucun
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
-        {% if results|length > 7 %}
-        <nav id="paginationWrapper">
-            <ul class="pagination justify-content-center">
-                <li class="page-item"><a class="page-link" href="#" id="prevPage">Précédent</a></li>
-                <li class="page-item"><a class="page-link" href="#" id="nextPage">Suivant</a></li>
-            </ul>
-        </nav>
-        {% endif %}
-    {% else %}
-        <p class="text-muted text-center">Aucun résultat de scan disponible.</p>
+  {% if results %}
+    {% if results|length > 7 %}
+    <div class="mb-3">
+      <label for="entriesPerPage" class="form-label">Afficher :</label>
+      <select id="entriesPerPage" class="form-select" onchange="updateTable()">
+        <option value="5">5</option>
+        <option value="10" selected>10</option>
+      </select> entrées
+    </div>
     {% endif %}
 
-    <div class="text-center">
-        <a href="/" class="btn btn-back">← Retour au tableau de bord</a>
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th>IP</th>
+            <th>Ports ouverts</th>
+          </tr>
+        </thead>
+        <tbody id="scanTableBody">
+          {% for result in results %}
+          <tr>
+            <td>{{ result.ip }}</td>
+            <td>
+              {% if result.open_ports %}
+                {{ result.open_ports | join(", ") }}
+              {% else %}
+                Aucun
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+
+    {% if results|length > 7 %}
+    <nav id="paginationWrapper">
+      <ul class="pagination justify-content-center">
+        <li class="page-item"><a class="page-link" href="#" id="prevPage">Précédent</a></li>
+        <li class="page-item"><a class="page-link" href="#" id="nextPage">Suivant</a></li>
+      </ul>
+    </nav>
+    {% endif %}
+  {% else %}
+    <p class="text-muted text-center">Aucun résultat de scan disponible.</p>
+  {% endif %}
+
+  <div class="text-center">
+    <a href="/" class="btn btn-back">← Retour au tableau de bord</a>
+  </div>
 </div>
 
 <footer>
-    © 2025 Seahawks Monitoring
+  © 2025 Seahawks Monitoring
 </footer>
 
 <!-- Bootstrap JS -->
@@ -112,50 +112,50 @@
 
 <!-- Pagination Script -->
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const tableBody = document.getElementById("scanTableBody");
-        if (!tableBody) return;
+  document.addEventListener("DOMContentLoaded", function () {
+    const tableBody = document.getElementById("scanTableBody");
+    if (!tableBody) return;
 
-        const rows = Array.from(tableBody.getElementsByTagName("tr"));
-        if (rows.length <= 7) return; // Pas de pagination si moins de 8 lignes
+    const rows = Array.from(tableBody.getElementsByTagName("tr"));
+    if (rows.length <= 7) return;
 
-        let currentPage = 1;
-        let entriesPerPage = 10;
-        const prevPageBtn = document.getElementById("prevPage");
-        const nextPageBtn = document.getElementById("nextPage");
-        const entriesSelect = document.getElementById("entriesPerPage");
+    let currentPage = 1;
+    let entriesPerPage = 10;
+    const prevPageBtn = document.getElementById("prevPage");
+    const nextPageBtn = document.getElementById("nextPage");
+    const entriesSelect = document.getElementById("entriesPerPage");
 
-        function updateTable() {
-            entriesPerPage = parseInt(entriesSelect.value);
-            showPage(1);
-        }
+    function updateTable() {
+      entriesPerPage = parseInt(entriesSelect.value);
+      showPage(1);
+    }
 
-        function showPage(page) {
-            currentPage = page;
-            let start = (currentPage - 1) * entriesPerPage;
-            let end = start + entriesPerPage;
+    function showPage(page) {
+      currentPage = page;
+      let start = (currentPage - 1) * entriesPerPage;
+      let end = start + entriesPerPage;
 
-            rows.forEach((row, index) => {
-                row.style.display = index >= start && index < end ? "table-row" : "none";
-            });
+      rows.forEach((row, index) => {
+        row.style.display = index >= start && index < end ? "table-row" : "none";
+      });
 
-            prevPageBtn.parentElement.classList.toggle("disabled", currentPage === 1);
-            nextPageBtn.parentElement.classList.toggle("disabled", end >= rows.length);
-        }
+      prevPageBtn.parentElement.classList.toggle("disabled", currentPage === 1);
+      nextPageBtn.parentElement.classList.toggle("disabled", end >= rows.length);
+    }
 
-        prevPageBtn.addEventListener("click", function (event) {
-            event.preventDefault();
-            if (currentPage > 1) showPage(currentPage - 1);
-        });
-
-        nextPageBtn.addEventListener("click", function (event) {
-            event.preventDefault();
-            if ((currentPage * entriesPerPage) < rows.length) showPage(currentPage + 1);
-        });
-
-        entriesSelect.addEventListener("change", updateTable);
-        updateTable();
+    prevPageBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      if (currentPage > 1) showPage(currentPage - 1);
     });
+
+    nextPageBtn.addEventListener("click", function (event) {
+      event.preventDefault();
+      if ((currentPage * entriesPerPage) < rows.length) showPage(currentPage + 1);
+    });
+
+    entriesSelect.addEventListener("change", updateTable);
+    updateTable();
+  });
 </script>
 
 </body>

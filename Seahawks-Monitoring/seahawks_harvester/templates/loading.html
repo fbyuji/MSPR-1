@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chargement...</title>
     
-    <!-- Lien vers le fichier CSS -->
+    <!-- Lien CSS -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 
     <style>
@@ -48,10 +48,10 @@
     </div>
 
     <script>
-        // Rediriger automatiquement vers la page des résultats après 500 ms
+        // Redirige vers la page des résultats après un court délai
         setTimeout(() => {
             window.location.href = "/scan/results";
-        }, 500);  // Garde le même délai rapide
+        }, 500);
     </script>
 
 </body>
