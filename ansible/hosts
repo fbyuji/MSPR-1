@@ -1,0 +1,2 @@
+[Seahawks-Monitoring]
+10.60.179.18 ansible_user=mariama ansible_ssh_port=22

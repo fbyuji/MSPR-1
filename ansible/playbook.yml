@@ -1,0 +1,99 @@
+- name: Déployer Seahawks-Monitoring avec Docker et Docker Compose
+  hosts: all
+  become: yes
+
+  tasks:
+    - name: Installer les paquets de base
+      apt:
+        name: "{{ item }}"
+        state: present
+        update_cache: yes
+      loop:
+        - curl
+        - unzip
+        - apt-transport-https
+        - ca-certificates
+        - gnupg
+        - software-properties-common
+
+    - name: Supprimer ancienne clé et liste Docker si existante
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/apt/keyrings/docker.gpg
+        - /etc/apt/sources.list.d/docker.list
+
+    - name: Créer le dossier keyrings Docker s'il n'existe pas
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Télécharger la clé GPG Docker et convertir en binaire
+      shell: |
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+      args:
+        creates: /etc/apt/keyrings/docker.gpg
+
+    - name: Donner les bons droits à la clé
+      file:
+        path: /etc/apt/keyrings/docker.gpg
+        mode: '0644'
+
+    - name: Ajouter le dépôt Docker (correctement avec signed-by)
+      apt_repository:
+        repo: "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu noble stable"
+        filename: docker
+        state: present
+
+    - name: Mettre à jour le cache APT
+      apt:
+        update_cache: yes
+
+    - name: Installer Docker
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+        update_cache: yes
+
+    - name: Activer le service Docker au démarrage
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Installer Docker Compose plugin
+      apt:
+        name: docker-compose-plugin
+        state: present
+
+    - name: Vérifier la version de Docker Compose
+      command: docker compose version
+      register: docker_compose_version
+      changed_when: false
+
+    - name: Créer le répertoire pour Seahawks-Monitoring
+      file:
+        path: /home/ubuntu/MSPR-1
+        state: directory
+        mode: '0755'
+
+    - name: Copier l'application Seahawks-Monitoring sur la VM
+      copy:
+        src: /mnt/c/Users/HP/Desktop/MSPR-1/
+        dest: /home/ubuntu/MSPR-1/
+        mode: '0755'
+
+    - name: Installer python3-venv si absent
+      apt:
+        name: python3-venv
+        state: present
+
+    - name: Lancer les services avec Docker Compose
+      command: docker compose up --build -d
+      args:
+        chdir: /home/ubuntu/MSPR-1/Seahawks-Monitoring
