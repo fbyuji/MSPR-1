@@ -12,8 +12,8 @@ COPY . .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN chmod +x update.sh
+RUN chmod +x seahawks_harvester/update.sh
 
 EXPOSE 5000
 
-CMD ["bash", "-c", "./update_harvester.sh && python app.py"]
+CMD ["bash", "-c", "./seahawks_harvester/update.sh && python app.py"]
